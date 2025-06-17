@@ -1,29 +1,33 @@
 import dotenv from "dotenv";
 import { app } from "./app.js";
+import connectDB from "./db/index.js";
 
 dotenv.config({
-  path: "./.env",
+    path: "./.env",
 });
 
-const startServer = async () => {
-  try {
-    app.listen(process.env.PORT || 4500, () => {
-      console.log(`server is running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 4500;
+
+connectDB()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`server is running on PORT ${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.log(
+            `Possibility of Mongodb Error\nServer is not running... \n ${error}`,
+        );
+        process.exit(1);
     });
-  } catch (error) {
-    console.log("server not running");
-    process.exit(1); // Exit with failure
-  }
-};
+
 // Handle uncaught exceptions and unhandled promise rejections
 process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err);
-  process.exit(1);
+    console.error("Uncaught Exception:", err);
+    process.exit(1);
 });
 
 process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled Rejection:", reason);
-  process.exit(1);
+    console.error("Unhandled Rejection:", reason);
+    process.exit(1);
 });
-
-startServer();
